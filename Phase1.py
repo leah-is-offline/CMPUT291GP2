@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 import os
 import json
+from datetime import datetime
 
 '''
 TO DO: november 17
@@ -12,11 +13,17 @@ TO DO: november 17
 
 def main():
 
+    
+    startTime = datetime.now()
+    
     client = MongoClient()
     db = client["291db"]
     createPostCollection(db)
     createTagsCollection(db)
     createVotesCollection(db)
+
+    end = datetime.now() - startTime
+    print("This run took: {en}".format(en = end))
 
 def createPostCollection(db):
 
