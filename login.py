@@ -1,5 +1,6 @@
 from state_machine import State
 from menu import Menu
+from getpas import getpass
 import db
 
 def inputYesNo(prompt):
@@ -24,6 +25,6 @@ class Login(State):
         loginSuccess = False
         while not loginSuccess:
             uid = input("Username: ")
-            password = input("Password: ")
+            password = getpass("Password: ")
             loginSuccess = db.login(uid, password)
         return Menu
