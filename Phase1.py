@@ -13,17 +13,15 @@ TO DO: november 17
 '''
 
 def main():
-
     startTime = datetime.now()
-    
+
     client = MongoClient()
     db = client["291db"]
 
     clearCollectionsIfExists(db)
+    createPostCollection(db)
     createVotesCollection(db)
     createTagsCollection(db)
-    createPostCollection(db)
-    
 
 
     end = datetime.now() - startTime
@@ -33,22 +31,21 @@ def main():
 def clearCollectionsIfExists(db):
     global posts_collection, votes_collection, tags_collection
     startTime = datetime.now()
-    
-    collections = db.list_collection_names()
-    print(collections)
-    
-    if "posts_collection" in collections:
-        posts_collection = db["posts_collection"]
-        posts_collection.delete_many({})
 
-    if "tags_collection" in collections:
-        tags_collection = db["tags_collection"]
-        tags_collection.delete_many({})
+    required_collections = ["posts", "votes", "tags"]
 
-    if "votes_collection" in collections:
-        votes_collection = db["votes_collection"]
-        votes_collection.delete_many({})
-    
+    existing_collections = db.list_collection_names()
+
+    for collection_name in required_collections:
+        if collection_name in existing_collections:
+            db[collection_name].delete_many({})
+        else:
+            db.create_collection(collection_name)
+
+    posts_collection = db["posts"]
+    tags_collection = db["tags"]
+    votes_collection = db["votes"]
+
     end = datetime.now() - startTime
     print("clearing the collections took: {en}".format(en = end))
 
@@ -56,39 +53,46 @@ def createPostCollection(db):
     global posts_collection, votes_collection, tags_collection
     startTime = datetime.now()
 
-    with open('Posts.json') as file: 
+    with open('Posts.json') as file:
         file_data = json.load(file)
-    
-    for i in file_data['posts']['row']:
-        posts_collection.insert_one(i)
+
+    posts_collection.insert_many(
+        file_data['posts']['row'],
+        False
+    )
 
     end = datetime.now() - startTime
     print("building posts collection took: {en}".format(en = end))
 
-        
+
 def createTagsCollection(db):
     global posts_collection, votes_collection, tags_collection
     startTime = datetime.now()
-    
-    with open('Tags.json') as file: 
+
+    with open('Tags.json') as file:
         file_data = json.load(file)
-    
-    for i in file_data['tags']['row']:
-        tags_collection.insert_one(i)
+
+    tags_collection.insert_many(
+        file_data['tags']['row'],
+        False
+    )
 
     end = datetime.now() - startTime
     print("building tags collection took: {en}".format(en = end))
-        
+
 
 def createVotesCollection(db):
     global posts_collection, votes_collection, tags_collection
     startTime = datetime.now()
-    
-    with open('Votes.json') as file: 
+
+    with open('Votes.json') as file:
         file_data = json.load(file)
-    
-    for i in file_data['votes']['row']:
-        votes_collection.insert_one(i)
+
+    tags_collection.insert_many(
+        file_data['votes']['row'],
+        False
+    )
+
 
     end = datetime.now() - startTime
     print("building votes collection took: {en}".format(en = end))
@@ -96,12 +100,3 @@ def createVotesCollection(db):
 if __name__ == "__main__":
     main()
 
-   
-    
-
-    
-
-
-
-
-    
