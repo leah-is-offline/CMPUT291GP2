@@ -20,3 +20,4 @@ class Menu(State):
         while(choice < 1 or choice >= len(options)):
             choice = inputInt("Not in range: ")
 
+        return options[choice-1][1]

@@ -1,9 +1,17 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, collation
 import os
 import json
 from datetime import datetime
 
 global posts_collection, votes_collection, tags_collection
+
+class Timer():
+    def __init__(self):
+        self.startTime = datetime.now()
+
+    def end(self):
+        return datetime.now() - self.startTime
+
 
 '''
 TO DO: november 17
@@ -11,28 +19,27 @@ TO DO: november 17
     2)check if db exists before instantiating new one
     4)Ways to run faster
 '''
-
 def main():
-    startTime = datetime.now()
 
     client = MongoClient()
     db = client["291db"]
 
-    clearCollectionsIfExists(db)
+    timer= Timer()
+
+    initializeCollections(db)
     createPostCollection(db)
     createVotesCollection(db)
     createTagsCollection(db)
+    initializeCounters(db)
+
+    print("Entire db build took: {en}".format(en = timer.end()))
 
 
-    end = datetime.now() - startTime
-    print("Entire db build took: {en}".format(en = end))
-
-
-def clearCollectionsIfExists(db):
+def initializeCollections(db):
     global posts_collection, votes_collection, tags_collection
-    startTime = datetime.now()
+    timer = Timer()
 
-    required_collections = ["posts", "votes", "tags"]
+    required_collections = ["posts", "votes", "tags", "counters"]
 
     existing_collections = db.list_collection_names()
 
@@ -46,23 +53,22 @@ def clearCollectionsIfExists(db):
     tags_collection = db["tags"]
     votes_collection = db["votes"]
 
-    end = datetime.now() - startTime
-    print("clearing the collections took: {en}".format(en = end))
+    print("clearing the collections took: {en}".format(en = timer.end()))
 
 def createPostCollection(db):
     global posts_collection, votes_collection, tags_collection
-    startTime = datetime.now()
+    timer = Timer()
 
     with open('Posts.json') as file:
         file_data = json.load(file)
 
+    posts_collection.create_index("Id", unique = True)
     posts_collection.insert_many(
         file_data['posts']['row'],
         False
     )
 
-    end = datetime.now() - startTime
-    print("building posts collection took: {en}".format(en = end))
+    print("building posts collection took: {en}".format(en = timer.end()))
 
 
 def createTagsCollection(db):
@@ -72,6 +78,7 @@ def createTagsCollection(db):
     with open('Tags.json') as file:
         file_data = json.load(file)
 
+    tags_collection.create_index("Id", unique = True)
     tags_collection.insert_many(
         file_data['tags']['row'],
         False
@@ -83,19 +90,39 @@ def createTagsCollection(db):
 
 def createVotesCollection(db):
     global posts_collection, votes_collection, tags_collection
-    startTime = datetime.now()
+    timer = Timer()
 
     with open('Votes.json') as file:
         file_data = json.load(file)
 
-    tags_collection.insert_many(
+    votes_collection.create_index("Id", unique = True)
+    votes_collection.insert_many(
         file_data['votes']['row'],
         False
     )
 
+    print("building votes collection took: {en}".format(en = timer.end()))
 
-    end = datetime.now() - startTime
-    print("building votes collection took: {en}".format(en = end))
+def initializeCounters(db):
+    timer = Timer()
+
+    def getMaxId(collection_name):
+        pipeline = [
+            {"$sort": {"Id" : -1}},
+            {"$limit": 1}
+        ]
+        col = collation.Collation("en_US", numericOrdering=True)
+        cursor = db[collection_name].aggregate(pipeline, collation=col, allowDiskUse=True)
+        maxIdStr = list(cursor)[0]["Id"]
+        return int(maxIdStr)
+
+    for collection_name in ["posts", "votes", "tags"]:
+        db["counters"].insert_one({
+                "_id": collection_name,
+                "maxId": getMaxId(collection_name)
+        })
+
+    print("building counter collection took: {en}".format(en = timer.end()))
 
 if __name__ == "__main__":
     main()
