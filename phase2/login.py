@@ -19,7 +19,7 @@ class Login(State):
                 uid = inputInt("Unable to Register uid. Try another: ")
             return Menu
 
-        uid = inputInt("\nLogin uid:")
+        uid = inputInt("\nLogin uid: ")
         while not db.login(uid):
             uid = inputInt("Login failed. Try again. uid: ")
 
