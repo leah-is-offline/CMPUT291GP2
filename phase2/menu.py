@@ -17,7 +17,9 @@ class Menu(State):
         print()
 
         choice = inputInt("Please select an option: ")
-        while(choice < 1 or choice >= len(options)):
+        #removed = sign for choice length
+        #previously : while(choice < 1 or choice >= len(options))
+        while(choice < 1 or choice > len(options)):
             choice = inputInt("Not in range: ")
 
         return options[choice-1][1]

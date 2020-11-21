@@ -1,4 +1,6 @@
 from pymongo import MongoClient, collation
+import LoginInfoUtils
+
 
 client = None
 db = None
@@ -9,17 +11,19 @@ def init(port):
     global db
     client = MongoClient("mongodb://localhost:%d/" % (port))
     db = client["291db"]
+    
 
 def guestLogin():
     global guestMode
     guestMode = True
     return True
 
+
 def register(uid):
     global guestMode, currentuid
     guestMode = False
-    # TODO: add uid to database ----> Do we need to add until they perform and action?
-    # return True on success
+    # TODO: add uid to database ----> Do we need to add until they perform and action? new collection?
+    # return True on success -------> Done
 
     posts_coll = db["posts"]
     uid = str(uid) #uid in database is STRINGGGG >:0
@@ -37,8 +41,8 @@ def register(uid):
 def login(uid):
     global guestMode, currentuid
     guestMode = False
-    # TODO: verify uid exists in database
-    # return true on success
+    # TODO: verify uid exists in database  --->Done
+    # return true on success ----------------->Done
 
     posts_coll = db["posts"]
     uid = str(uid) 
@@ -47,9 +51,15 @@ def login(uid):
         if user["OwnerUserId"] == uid:
             currentuid = uid
             print("Welcome back user {currId}".format(currId = uid))
+            displayLoginInfo(currentuid)
             return True
     print("you dont exist...")
     return False
+
+
+def displayLoginInfo(uid):
+    LoginInfoUtils.questionsOwned(uid,db)
+    
 
 
 def getNextId(collectionName):
@@ -61,6 +71,7 @@ def getNextId(collectionName):
     )
     return str(counter["maxId"])
 
+
 def insertTags(tags):
     """
     Inserts each tag in tags into the tags collection
@@ -68,6 +79,8 @@ def insertTags(tags):
     # TODO: implementation
     for tag in tags:
         pass
+
+
 
 def insertPost(title :str, body :str, tags :list, postType :str):
     """
