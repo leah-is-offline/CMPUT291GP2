@@ -1,5 +1,6 @@
 from pymongo import MongoClient, collation
 import LoginInfoUtils
+from datetime import datetime
 
 
 client = None
@@ -86,8 +87,9 @@ def insertTags(tags):
 def insertPost(title :str, body :str, tags :list, postType :str):
     """
     How to do this?
-    - the post creation date should be set to the current date
+    - the post creation date should be set to the current date -----> Done
     """
+    
     global guestMode, currentuid
 
     # only use valid tags
@@ -99,9 +101,13 @@ def insertPost(title :str, body :str, tags :list, postType :str):
     for tag in tags:
         stringTags += "<%s>" % tag
 
+    currentDate = datetime.now()
+    currentISODate = my_date.isoformat()
+
     document = {
         "Id": getNextId("posts"),
         "PostTypeId": postType,
+        "CreationDate" : currentISODate,
         "Title": title,
         "Body": body,
         "Tags": stringTags,
@@ -111,7 +117,7 @@ def insertPost(title :str, body :str, tags :list, postType :str):
         "FavoriteCount": 0,
         "ContentLicense": "CC BY-SA 4.0"
     }
-
+    
     if(postType == "1"):
         document["AnswerCount"] = 0
 
