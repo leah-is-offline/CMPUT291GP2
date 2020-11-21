@@ -59,8 +59,9 @@ def login(uid):
 
 def displayLoginInfo(uid):
     LoginInfoUtils.questionsOwned(uid,db)
+    LoginInfoUtils.answersOwned(uid,db)
+    LoginInfoUtils.votesRegistered(uid, db)
     
-
 
 def getNextId(collectionName):
     global db
