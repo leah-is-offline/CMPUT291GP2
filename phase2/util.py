@@ -41,8 +41,7 @@ def inputPort(prompt, default = 0):
             continue
         else:
             break
-
-        
     return num
 
+    
 

@@ -18,16 +18,39 @@ def guestLogin():
 def register(uid):
     global guestMode, currentuid
     guestMode = False
-    # TODO: add uid to database
+    # TODO: add uid to database ----> Do we need to add until they perform and action?
     # return True on success
-    return False
+
+    posts_coll = db["posts"]
+    uid = str(uid) #uid in database is STRINGGGG >:0
+    results = posts_coll.find({"OwnerUserId": uid})
+    for user in results:
+        if user["OwnerUserId"] == uid:
+            #username exists in database - unavailable
+            print("Username already exists.")
+            return False
+    currentuid = uid
+    print("Username is available. Welcome user {currId}".format(currId = uid))
+    return True
+
 
 def login(uid):
     global guestMode, currentuid
     guestMode = False
     # TODO: verify uid exists in database
     # return true on success
+
+    posts_coll = db["posts"]
+    uid = str(uid) 
+    results = posts_coll.find({"OwnerUserId": uid})
+    for user in results:
+        if user["OwnerUserId"] == uid:
+            currentuid = uid
+            print("Welcome back user {currId}".format(currId = uid))
+            return True
+    print("you dont exist...")
     return False
+
 
 def getNextId(collectionName):
     global db
