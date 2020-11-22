@@ -163,7 +163,7 @@ def insertPost(title :str, body :str, tags :list, postType :str):
     db.posts.insert_one(document)
     print("new post inserted")
     print(document)
-    input("") #why do we do this
+    input("") 
 
 
 def search(keywords):

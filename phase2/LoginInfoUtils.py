@@ -19,7 +19,7 @@ def questionsOwned(uid, db):
     question_scores = []
     uid = str(uid)
     
-    results = posts_coll.find({"OwnerUserId": uid})
+    results = posts_coll.find({"OwnerUserId": uid}) #TO DO: CHECK IS RESULT NULL
     for post in results:
         if post["PostTypeId"] == "1":
             question_scores.append(post["Score"])
@@ -39,7 +39,7 @@ def answersOwned(uid, db):
     answer_scores = []
     uid = str(uid)
     
-    results = posts_coll.find({"OwnerUserId": uid})
+    results = posts_coll.find({"OwnerUserId": uid}) #TO DO: CHECK IS RESULT NULL
     for post in results:
         if post["PostTypeId"] == "2":
             answer_scores.append(post["Score"])
@@ -60,7 +60,7 @@ def votesRegistered(uid, db):
     votes_coll = db["votes"]
     uid = str(uid)
 
-
+    #TO DO: CHECK IS RESULT NULL
     results = votes_coll.find({"UserId": uid})
     for result in results:
         votes_casted = result["Id"]
