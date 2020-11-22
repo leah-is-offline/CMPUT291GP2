@@ -1,5 +1,5 @@
 from state_machine import State
-from util import inputInt
+from util import promptForOption
 from page_search import Search
 from page_make_post import PostQuestion
 import db_user
@@ -40,12 +40,5 @@ class Menu(State):
             ("Exit", None)
         ]
 
-        for i, option in enumerate(options, start=1):
-            print(str(i)+ ". " + option[0] )
-        print()
-
-        choice = inputInt("Please select an option: ")
-        while(choice < 1 or choice > len(options)):
-            choice = inputInt("Not in range: ")
-
-        return options[choice-1][1]
+        choice = promptForOption(options)
+        return options[choice][1]

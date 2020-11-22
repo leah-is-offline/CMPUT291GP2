@@ -8,16 +8,8 @@ the view count of the question should increase by one (in Posts) and
 the user should be able to perform a question action (as discussed next).
 '''
 
-def validateKeywords(keywords, separator):
-    #function to validate user provided keywords, user must provide one or more
-    while keywords.isspace() or len(keywords) == 0:
-        print("Invalid Entry")
-        keywords = input("Enter one or more keywords (separated by a space): ")
-    validKeywordsList = list(keywords.split(separator))
-    return validKeywordsList
 
-
-def getMatchingQuestions(keywords):
+def getMatchingQuestions(keywords: list):
     #function to retrieve matching posts from keyword search
     '''contain at least one keyword either in title, body, or tag fields
     (case-insensitive)'''
@@ -27,30 +19,24 @@ def getMatchingQuestions(keywords):
     #https://docs.mongodb.com/manual/reference/operator/query/regex/
 
     posts_coll = db.db_obj["posts"]
-    for key in keywords:
-        print("FINDING MATCHES FOR {key}".format(key=key))
-        print(keywords)
-    
+    keywords = list(filter(lambda word: len(word) > 2, keywords))
+    regexKeywords = '|'.join(keywords)
+    regex = ".*\\b({})\\b.*".format(regexKeywords)
+
+    matches = []
+
+    for field in ["Title", "Body", "Tags"]:
+        print("Searching for matches of {} in {}..."
+              .format(regexKeywords, field))
+
         query = {
-            "Title": {
-                "$regex": key+".*",
+            "PostTypeId": "1",
+            field: {
+                "$regex": regex,
                 "$options" :'i'
-                },
-            "PostTypeId": "1"
             }
-        
-        matches = posts_coll.find(query)
+        }
 
-        for match in matches:
-            title = match["Title"]
-            creationDate = match["CreationDate"]
-            score = match["Score"]
-            answerCount = match["AnswerCount"]
-            print("Title: {title} | Creation Date: {cd} | Score : {score} | AnswerCount {ac}\n".format(
-                    title = title, cd = creationDate, score = score, ac = answerCount))
-    
-    
-    
+        matches += list(posts_coll.find(query))
 
-
-
+    return matches

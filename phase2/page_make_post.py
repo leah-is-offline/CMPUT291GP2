@@ -1,6 +1,6 @@
 from state_machine import State
 import db
-from util import inputInt, inputYesNo
+from util import inputInt, inputYesNo, promptForOption
 from page_view_post import ViewPost
 
 def inputList(prompt, seperator):
@@ -33,17 +33,10 @@ class PostQuestion(State):
             ("Back to menu", Menu)
         ]
 
-        for i, option in enumerate(options, start=1):
-            print("%d. %s" % (i, option[0]) )
-        print()
-
-        choice = inputInt("Please select an option: ")
-        while(choice < 1 or choice > len(options)):
-            choice = inputInt("Not in range: ")
-
+        choice = promptForOption(options)
         ViewPost.postId = resultPost["Id"]
 
-        return options[choice-1][1]
+        return options[choice][1]
 
 
 

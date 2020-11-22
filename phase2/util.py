@@ -21,27 +21,17 @@ def inputInt(prompt, default = 0):
     return num
 
 
-def inputPort(prompt, default = 0):
-    num = default
-    while True:
-        try:
-            inStr = input(prompt)
-            if (inStr == ""):
-                break
-            num = int(inStr)
-            
-            if num in range(1,65536):
-                break
-            else:
-                print("Port must be an integer between 0 and 65535")
-                continue
-            
-        except ValueError:
-            print("Invalid, expected an integer. Try again")
-            continue
-        else:
-            break
+def inputIntRange(prompt, start:int, end:int, default = 0):
+    assert(end>=start)
+    num = inputInt(prompt, default)
+    while(num < start or num > end):
+        print("Must be in  range [{}, {}]: ".format(start, end))
+        num = inputInt(prompt, default)
     return num
 
-    
+def promptForOption(options):
+    for i, option in enumerate(options, start=1):
+        print(str(i)+ ". " + option[0] )
+    print("")
+    return inputIntRange("Please select an option: ", 1, len(options)) - 1
 
