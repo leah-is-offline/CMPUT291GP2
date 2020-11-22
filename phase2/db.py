@@ -1,6 +1,7 @@
 from pymongo import MongoClient, collation
 import LoginInfoUtils
 from datetime import datetime
+import searchUtils
 
 
 client = None
@@ -8,19 +9,23 @@ db = None
 currentuid = None
 guestMode = True
 
+
 def init(port):
+    #function to initialize database
     global db
     client = MongoClient("mongodb://localhost:%d/" % (port))
     db = client["291db"]
     
 
 def guestLogin():
+    #function to allow user to be a guest
     global guestMode
     guestMode = True
     return True
 
 
 def register(uid):
+    #function to register a user 
     global guestMode, currentuid
     guestMode = False
     # TODO: add uid to database ----> Do we need to add until they perform and action? new collection?
@@ -34,12 +39,14 @@ def register(uid):
             #username exists in database - unavailable
             print("Username already exists.")
             return False
+    #username does not exist in database - available
     currentuid = uid
     print("Username is available. Welcome user {currId}".format(currId = uid))
     return True
 
 
 def login(uid):
+    #function to check if a user logging in exists (IN POSTS COLLECTION)
     global guestMode, currentuid
     guestMode = False
     # TODO: verify uid exists in database  --->Done
@@ -59,12 +66,14 @@ def login(uid):
 
 
 def displayLoginInfo(uid):
+    #displays user information/records upon login
     LoginInfoUtils.questionsOwned(uid,db)
     LoginInfoUtils.answersOwned(uid,db)
     LoginInfoUtils.votesRegistered(uid, db)
     
 
 def getNextId(collectionName):
+    #function to return the next available ID for a collecion
     global db
     counter = db.counters.find_one_and_update(
         {"_id": collectionName},
@@ -75,16 +84,10 @@ def getNextId(collectionName):
 
 
 def insertTags(tags):
-    """
-    Inserts each tag in tags into the tags collection
-    """
-    '''
-    When posting a question, the user will provide some tags.
-    If a user-provided tag exist in Tags collection, you will add one to the count field of the tag.
-    If a user-provided tag does not exist in Tags collection,
-    you will add it to the collection as a new row with a unique id and count 1'''
-
-    # TODO: implementation ---> Done after figuring out what those fields mean
+    #funct to Insert each tag in tags into the tags collection
+    '''If a user-provided tag exist in Tags collection, you will add one to the count field of the tag.
+    If a user-provided tag does not exist in Tags collection,you will add it to the collection as a new row with a unique id and count 1'''
+    # TODO: implementation ---> Done after figuring out what excerptPostID and WikiPostId is
     
     tags_coll = db["tags"]
     for tag in tags:
@@ -115,6 +118,7 @@ def insertTags(tags):
 
 
 def insertPost(title :str, body :str, tags :list, postType :str):
+    #function to insert a post into the database
     """
     How to do this?
     - the post creation date should be set to the current date -----> Done
@@ -156,8 +160,13 @@ def insertPost(title :str, body :str, tags :list, postType :str):
     if(not guestMode):
         document["OwnerUserId"] = currentuid
 
-
     db.posts.insert_one(document)
     print("new post inserted")
     print(document)
-    input("")
+    input("") #why do we do this
+
+
+def search(keywords):
+    #function to display search results
+    searchUtils.getMatchingQuestions(keywords, db)
+    
