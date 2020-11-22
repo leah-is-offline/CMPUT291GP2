@@ -26,9 +26,10 @@ def main():
     timer= Timer()
 
     initializeCollections(db)
+    createTagsCollection(db)
     createPostCollection(db)
     createVotesCollection(db)
-    createTagsCollection(db)
+    createUsersCollection(db)
     initializeCounters(db)
 
     print("Entire db build took: {en}".format(en = timer.end()))
@@ -39,7 +40,7 @@ def initializeCollections(db):
     global posts_collection, votes_collection, tags_collection
     timer = Timer()
 
-    required_collections = ["posts", "votes", "tags", "counters"]
+    required_collections = ["posts", "votes", "tags", "counters","users"]
 
     existing_collections = db.list_collection_names()
 
@@ -118,11 +119,49 @@ def initializeCounters(db):
 
     for collection_name in ["posts", "votes", "tags"]:
         db["counters"].insert_one({
-                "_id": collection_name,
-                "maxId": getMaxId(collection_name)
+            "_id": collection_name,
+            "maxId": getMaxId(collection_name)
         })
 
     print("building counter collection took: {en}".format(en = timer.end()))
+
+def createUsersCollection(db):
+    global posts_collection, votes_collection
+    timer = Timer()
+
+    def newUser(uid):
+        return {
+            "_id": uid,
+            "questionCount" : 0,
+            "answerCount": 0,
+            "voteCount": 0
+        }
+
+    users = {}
+    for post in posts_collection.find({}):
+        if "OwnerUserId" in post:
+            uid = post["OwnerUserId"]
+            postType = ("question" if post["PostTypeId"] == "1" else "answer")
+            if uid in users:
+                users[uid][postType+"Count"] += 1
+            else:
+                users[uid] = newUser(uid)
+                users[uid][postType+"Count"] = 1;
+
+    for vote in votes_collection.find({}):
+        if "UserId" in vote:
+            uid = vote["UserId"]
+            if not uid in users:
+                users[uid] = newUser(uid)
+            users[uid]["voteCount"] += 1
+
+    db["users"].insert_many(
+        users.values(),
+        False
+    )
+
+    print("building users collection took: {en}".format(en = timer.end()))
+
 
 if __name__ == "__main__":
     main()

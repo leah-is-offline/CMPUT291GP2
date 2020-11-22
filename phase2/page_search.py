@@ -1,14 +1,12 @@
 from state_machine import State
-import db
 from util import inputInt, inputYesNo
-import searchUtils 
-
+import db_search
 
 class Search(State):
     def run(self):
         print("-- Search --")
         keywords = input("Enter one or more keywords (separated by a space): ")
-        keywordsList = searchUtils.validateKeywords(keywords, " ")
-        db.search(keywordsList)
+        keywordsList = db_search.validateKeywords(keywords, " ")
+        db_search.getMatchingQuestions(keywords)
         return None
 

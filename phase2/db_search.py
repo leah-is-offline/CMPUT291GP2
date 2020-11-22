@@ -1,4 +1,5 @@
 import re
+import db
 '''
 TO DO:
 The user should be able to select a question to see all fields of
@@ -16,7 +17,7 @@ def validateKeywords(keywords, separator):
     return validKeywordsList
 
 
-def getMatchingQuestions(keywords, db):
+def getMatchingQuestions(keywords):
     #function to retrieve matching posts from keyword search
     '''contain at least one keyword either in title, body, or tag fields
     (case-insensitive)'''
@@ -25,7 +26,7 @@ def getMatchingQuestions(keywords, db):
 
     #https://docs.mongodb.com/manual/reference/operator/query/regex/
 
-    posts_coll = db["posts"]
+    posts_coll = db.db_obj["posts"]
     for key in keywords:
         print("FINDING MATCHES FOR {key}".format(key=key))
         print(keywords)

@@ -1,6 +1,6 @@
-from state_machine import State, StateMachine
-from login import Login
 import db
+from state_machine import StateMachine
+from page_login import Login
 
 from util import inputInt, inputPort
 
@@ -13,5 +13,4 @@ def main():
 
 if __name__ == "__main__":
     main()
-    
 
