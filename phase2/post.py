@@ -18,4 +18,4 @@ class PostQuestion(State):
         body = input("Body: ")
         tags = inputList("Tags (space): ", " ")
         db.insertPost(title, body, tags, "1")
-        return None
+        return Menu

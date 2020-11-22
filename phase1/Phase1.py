@@ -6,6 +6,8 @@ from util import inputPort
 
 global posts_collection, votes_collection, tags_collection
 
+#TO DO: users collection
+
 
 class Timer():
     def __init__(self):
