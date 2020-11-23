@@ -173,3 +173,13 @@ def getPost(postId):
     if(len(result) > 0):
         return result[0]
     return None
+
+def updateViewCount(postId):
+    #function to update the viewCount of a post upon being viewed by user
+    #NOTE: only questions have a viewCount
+    posts = db_obj["posts"]
+    counter = db_obj.posts.find_one_and_update(
+        {"Id": postId},
+        {"$inc": {"ViewCount": 1}},
+        new=True
+    )

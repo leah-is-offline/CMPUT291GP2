@@ -13,8 +13,9 @@ def getMatchingQuestions(keywords: list):
     #function to retrieve matching posts from keyword search
     '''contain at least one keyword either in title, body, or tag fields
     (case-insensitive)'''
-    #TO DO : find matches in also "Tags" and "Body"
-    #I think that i might be searching for spaces
+    #TO DO : find matches in also "Tags" and "Body" ----> Done
+    #I think that i might be searching for spaces ------> Done
+    #TO DO: remove duplicates
 
     #https://docs.mongodb.com/manual/reference/operator/query/regex/
 

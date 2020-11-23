@@ -24,6 +24,9 @@ class ViewPost(State):
             for key, value in post.items():
                 print('{:15} {}'.format(key+':', value))
 
+            db.updateViewCount(ViewPost.postId)
+            
+
         print("\n\nWhat would you like to do?")
 
         # Compose the list of user option / actions
@@ -63,3 +66,4 @@ class ViewPost(State):
 
     def showAnswers(self):
         pass
+        #get list of posts where ParentID = postid
