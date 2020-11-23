@@ -69,7 +69,7 @@ def getNextId(collectionName):
 
 
 def insertVote(postId, voteType):
-    # TODO: UPDATE post.score as well
+    # TODO: UPDATE post.score as well ---> Done
 
     global guestMode, currentuid
 
@@ -86,6 +86,17 @@ def insertVote(postId, voteType):
         document["UserId"] = currentuid
 
     db_obj.votes.insert_one(document)
+    
+
+    #update posts.score as well
+    #could use getPost function?
+    posts = db_obj["posts"]
+    document = posts.find_one_and_update(
+                {"Id": str(postId)},
+                {"$inc":{"Score": 1}},
+                new=True
+            )
+
 
 
 def insertTags(tags):
