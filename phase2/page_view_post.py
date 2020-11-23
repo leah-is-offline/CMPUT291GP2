@@ -16,17 +16,11 @@ class ViewPost(State):
 
         print("-- Viewing post: %s --" % ViewPost.postId )
 
-        post = db.getPost(ViewPost.postId)
-
-        if (post == None):
-            print("No such post in databse")
-        else:
-            for key, value in post.items():
-                print('{:15} {}'.format(key+':', value))
-
-            db.updateViewCount(ViewPost.postId)
-            
-
+        #post = db.getPost(ViewPost.postId)
+        post = db.viewPost(ViewPost.postId)
+        for key, value in post.items():
+            print('{:15} {}'.format(key+':', value))
+        
         print("\n\nWhat would you like to do?")
 
         # Compose the list of user option / actions
@@ -60,10 +54,15 @@ class ViewPost(State):
 
     def voteOnPost(self):
         db.insertVote(ViewPost.postId, "2")
-        print("\nSweet! You voted on this post!")
         input("Press enter to continue")
         return ViewPost
 
     def showAnswers(self):
         pass
         #get list of posts where ParentID = postid
+
+        #state dependent on user option
+        # if user selects main menu --> return Menu
+        # if user selects which answer they want to see --> return viewPost 
+        #menu options after display: which answer do you want to select , back to main menu
+            #menu option selecting answer: display full answer post, next menu: vote on answer 

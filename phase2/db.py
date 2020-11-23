@@ -69,41 +69,47 @@ def getNextId(collectionName):
 
 
 def insertVote(postId, voteType):
-    # TODO: UPDATE post.score as well ---> Done
-
     global guestMode, currentuid
 
-    currentDate = datetime.now()
-
-    document = {
-        "Id": getNextId("votes"),
-        "PostId": str(postId),
-        "CreationData": currentDate.isoformat(),
-        "VoteTypeId": voteType
-    }
-
-    if(not guestMode):
-        document["UserId"] = currentuid
-
-    db_obj.votes.insert_one(document)
+    votedOn = False
     
+    if (not guestMode):
+        results = list(db_obj.votes.find({"UserId" : currentuid, "PostId" : str(postId)}))
+        if (len(results) > 0):
+            print("You have already voted on this post! Vote not recorded.")
+            votedOn = True
 
-    #update posts.score as well
-    #could use getPost function?
-    posts = db_obj["posts"]
-    document = posts.find_one_and_update(
-                {"Id": str(postId)},
-                {"$inc":{"Score": 1}},
-                new=True
-            )
+    if(not votedOn):
+        currentDate = datetime.now()
 
+        document = {
+            "Id": getNextId("votes"),
+            "PostId": str(postId),
+            "CreationData": currentDate.isoformat(),
+            "VoteTypeId": voteType
+        }
 
+        if(not guestMode):
+            document["UserId"] = currentuid
+
+        db_obj.votes.insert_one(document)
+        increasePostScore(postId)
+        print("\nSweet! You voted on this post!")
+
+        
+def increasePostScore(postId):
+    # function to increase score of a post
+    global db_obj
+    
+    db_obj.posts.find_one_and_update(
+                        {"Id": str(postId)},
+                        {"$inc":{"Score": 1}},
+                        new=True
+                    )
 
 def insertTags(tags):
     # funct to Insert each tag in tags into the tags collection
-    """If a user-provided tag exist in Tags collection, you will add one to the count field of the tag.
-    If a user-provided tag does not exist in Tags collection,you will add it to the collection as a new row with a unique id and count 1"""
-    # TODO: implementation ---> Done after figuring out what excerptPostID and WikiPostId is
+    # TODO: Figure out what excerptPostID and WikiPostId is
 
     tags_coll = db_obj["tags"]
     for tag in tags:
@@ -115,7 +121,6 @@ def insertTags(tags):
             )
         else:
             # create a new document for that tag
-            # TO DO: Find out what excerptPostID and WikiPostId is
             tempDigit = -1
             document = {
                 "Id": getNextId("tags"),
@@ -168,18 +173,24 @@ def insertPost(title: str, body: str, tags: list, postType: str):
     return document
 
 def getPost(postId):
-    # TODO: update post.viewcount
+    #function to  return post information
     result = list(db_obj.posts.find({"Id": postId}))
     if(len(result) > 0):
         return result[0]
     return None
 
-def updateViewCount(postId):
-    #function to update the viewCount of a post upon being viewed by user
-    #NOTE: only questions have a viewCount
-    posts = db_obj["posts"]
-    counter = db_obj.posts.find_one_and_update(
+def viewPost(postId):
+    #function to update view count of post upon viewing and return post information
+    global db_obj
+    
+    post = getPost(postId)
+    if (post == None):
+        return None
+
+    db_obj.posts.find_one_and_update(
         {"Id": postId},
         {"$inc": {"ViewCount": 1}},
         new=True
-    )
+        )
+
+    return post 
