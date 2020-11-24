@@ -7,11 +7,6 @@ def inputList(prompt, seperator):
     result = input(prompt)
     return result.split(seperator)
 
-"""
-Post a question.
-The user should be able to post a question by providing:
-    a title text, a body text, and zero or more tags.
-"""
 class PostQuestion(State):
     def run(self):
         # import here

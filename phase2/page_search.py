@@ -48,8 +48,8 @@ class Search(State):
         return Search
 
     def inputKeywords(self):
+        # function to validate user provided keywords, user must provide one or more
         keywords = input("Enter one or more keywords (separated by a space): ")
-        #function to validate user provided keywords, user must provide one or more
         while keywords.isspace() or len(keywords) == 0:
             print("Invalid Entry")
             keywords = input("Enter one or more keywords (separated by a space): ")

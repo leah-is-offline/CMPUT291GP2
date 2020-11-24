@@ -8,14 +8,11 @@ class Login(State):
     def run(self):
         print("-- Login --")
         guest = inputYesNo("\nLogin as a guest? ")
-        #if user entered : yes or y, true. Else, false
         if (guest):
             db.guestLogin()
-            # got to the menu
             return Menu
 
         register = inputYesNo("\nWould you like to register?")
-        #if user entered : yes or y, true. Else, false
         if (register):
             uid = inputInt("New uid: ")
             while not db.register(uid):
@@ -26,7 +23,6 @@ class Login(State):
         while not db.login(uid):
             uid = inputInt("Login failed. Try again. uid: ")
         displayUserInfo(db.currentuid)
-
         return Menu
 
 
@@ -35,6 +31,7 @@ def displayUserInfo(uid):
     questionCount, questionScoreAvg ,answerCount, answerScoreAvg = db_user.questionsAnswersOwned(uid)
     votesCount = db_user.votesRegistered(uid)
 
+    print("-- Your Info --")
     print("User id: %s" % uid)
     print("User {userid} owns {qcount} question(s)"
           .format(userid = uid, qcount = questionCount))
@@ -51,5 +48,3 @@ def displayUserInfo(uid):
     print("User {userid} has {vcasts} votes registered for them"
           .format(userid = uid, vcasts = votesCount))
 
-    print("-- Your Info --")
-    

@@ -95,7 +95,7 @@ class ViewPost(State):
             
             
     def displayAnswerPage(self, page, answers:list):
-        # function to format and print answers of user chosen post
+        # function to format and print answers of the post being viewed
         from math import ceil
         global page_size
 
