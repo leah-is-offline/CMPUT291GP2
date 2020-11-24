@@ -1,15 +1,15 @@
+import pymongo
 from pymongo import MongoClient, collation
 import os
 import json
 from datetime import datetime
-from util import inputPort
+from util import inputIntRange
 
 global posts_collection, votes_collection, tags_collection
 
-#TO DO: users collection
-
 
 class Timer():
+    # class to initialize a timer
     def __init__(self):
         self.startTime = datetime.now()
 
@@ -18,8 +18,8 @@ class Timer():
 
 
 def main():
-
-    port = inputPort("Please enter a port number (Default is 27017): ", 27017)
+    
+    port = inputIntRange("Please enter a port number (Default is 27017): ", 1, 65535, 27017)
     client = MongoClient("mongodb://localhost:%d/" % (port))
     db = client["291db"]
 
@@ -35,8 +35,8 @@ def main():
     print("Entire db build took: {en}".format(en = timer.end()))
 
 
-
 def initializeCollections(db):
+    # function to init required collections and clear them if already in db
     global posts_collection, votes_collection, tags_collection
     timer = Timer()
 
@@ -57,7 +57,8 @@ def initializeCollections(db):
     print("clearing the collections took: {en}".format(en = timer.end()))
 
 def createPostCollection(db):
-    global posts_collection, votes_collection, tags_collection
+    # function to initialize posts collection from a json file in CWD
+    global posts_collection
     timer = Timer()
 
     with open('Posts.json') as file:
@@ -73,7 +74,8 @@ def createPostCollection(db):
 
 
 def createTagsCollection(db):
-    global posts_collection, votes_collection, tags_collection
+     # function to initialize tags collection from a json file in CWD
+    global tags_collection
     startTime = datetime.now()
 
     with open('Tags.json') as file:
@@ -90,7 +92,8 @@ def createTagsCollection(db):
 
 
 def createVotesCollection(db):
-    global posts_collection, votes_collection, tags_collection
+    # function to initialize votes collection from a json file in CWD
+    global votes_collection
     timer = Timer()
 
     with open('Votes.json') as file:
@@ -105,6 +108,8 @@ def createVotesCollection(db):
     print("building votes collection took: {en}".format(en = timer.end()))
 
 def initializeCounters(db):
+    # function to initialize counter collection
+    # returns next largest Id for collections (posts, votes, tags)
     timer = Timer()
 
     def getMaxId(collection_name):
@@ -126,6 +131,8 @@ def initializeCounters(db):
     print("building counter collection took: {en}".format(en = timer.end()))
 
 def createUsersCollection(db):
+    # function to initialize user collection 
+    #(_id = uid)
     global posts_collection, votes_collection
     timer = Timer()
 
