@@ -64,7 +64,7 @@ class Search(State):
         end = min(start + page_size, pCount)
 
         print("-------- Page {} of {} -----------"
-              .format(page, ceil(pCount/page_size)))
+              .format(page+1, ceil(pCount/page_size)))
 
         pagePosts = posts[start:end]
         for idx, post in enumerate(pagePosts, start=1):

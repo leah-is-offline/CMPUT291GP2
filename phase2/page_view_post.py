@@ -1,6 +1,8 @@
 from state_machine import State
 import db
-from util import inputInt
+from util import inputInt, promptForOption, inputIntRange
+
+page_size = 5
 
 class ViewPost(State):
     # static variable
@@ -58,11 +60,69 @@ class ViewPost(State):
         return ViewPost
 
     def showAnswers(self):
-        pass
-        #get list of posts where ParentID = postid
+        answers = db.getAnswers(ViewPost.postId)
+        if len(answers) == 0:
+            print("This questions has not been answered yet.")
+            print("\n\nWhat would you like to do?")
+            return Menu
+        else:
+            global page_size
+            page = 0
+            
+            while True:
+                
+                pageAnswers = self.displayAnswerPage(page, answers)
 
-        #state dependent on user option
-        # if user selects main menu --> return Menu
-        # if user selects which answer they want to see --> return viewPost 
-        #menu options after display: which answer do you want to select , back to main menu
-            #menu option selecting answer: display full answer post, next menu: vote on answer 
+                options = []
+                if len(pageAnswers) > 0:
+                    options.append(("View Answer", "view_answer"))
+                    if len(answers) > (page+1)*page_size:
+                        options.append(("Next Page", "next_page"))
+                else:
+                    print("\nNo Answers...")
+
+            
+                choice = promptForOption(options)
+                if options[choice][1] == "next_page":
+                    page += 1
+                elif options[choice][1] == "view_answer":
+                    idx = inputIntRange("Which Answer: ", 1, len(pageAnswers))-1
+                    ViewPost.postId = pageAnswers[idx]["Id"]
+                    
+                    return ViewPost
+            
+            
+    def displayAnswerPage(self, page, answers:list):
+        from math import ceil
+        global page_size
+
+        pCount = len(answers)
+        start = min(page * page_size, pCount)
+        end = min(start + page_size, pCount)
+
+        print("-------- Page {} of {} -----------"
+              .format(page+1, ceil(pCount/page_size)))
+
+
+        pageAnswers = answers[start:end]
+        for idx, answer in enumerate(pageAnswers, start=1):
+            body = answer["Body"] 
+            body = body[:min(len(body), 80)] + "..."
+            creationDate = answer["CreationDate"]
+            score = answer["Score"] 
+
+    
+            print("{i}. Body: {body}"
+                  .format(i = idx, body = body))
+            print("Creation Date: {cd} | Score : {score}\n"
+                  .format(cd = creationDate, score = score))
+        return pageAnswers
+            
+
+
+            #state dependent on user option
+            # user should be able to view full answer
+            # user should be able to view another page of answers
+            # user should be able to vote on answer
+            # user should be able to return to the main menu
+        

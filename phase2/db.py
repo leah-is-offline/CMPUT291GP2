@@ -1,5 +1,6 @@
 from pymongo import MongoClient, collation
 from datetime import datetime
+import pdb
 
 client = None
 db_obj = None
@@ -109,7 +110,6 @@ def increasePostScore(postId):
 
 def insertTags(tags):
     # funct to Insert each tag in tags into the tags collection
-    # TODO: Figure out what excerptPostID and WikiPostId is
 
     tags_coll = db_obj["tags"]
     for tag in tags:
@@ -172,15 +172,16 @@ def insertPost(title: str, body: str, tags: list, postType: str):
     db_obj.posts.insert_one(document)
     return document
 
+
 def getPost(postId):
-    #function to  return post information
+    # function to  return post information
     result = list(db_obj.posts.find({"Id": postId}))
     if(len(result) > 0):
         return result[0]
     return None
 
 def viewPost(postId):
-    #function to update view count of post upon viewing and return post information
+    # function to update view count of post upon viewing and return post information
     global db_obj
     
     post = getPost(postId)
@@ -193,4 +194,32 @@ def viewPost(postId):
         new=True
         )
 
-    return post 
+    return post
+
+def getAnswers(postId):
+    # function to get list of posts where ParentID = postid
+    global db_obj
+   
+    questions = list(db_obj.posts.find({"Id": str(postId)}))
+    if len(questions) == 0:
+        return None
+    
+    question = questions[0]
+    results = list(db_obj.posts.find({"ParentId" : str(postId)}))
+    answers = []
+
+    #pdb.set_trace()
+    
+    idx = 0
+    if ("AcceptedAnswerId" in question):
+        for i,result in enumerate(results):
+            if result["Id"] == question["AcceptedAnswerId"]:
+                idx = i
+                break
+
+        answers.append(results[idx])
+        answers[0]["Body"] = ("***" + answers[0]["Body"])
+        results.remove(results[idx])
+
+    answers += results
+    return answers
