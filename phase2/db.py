@@ -130,7 +130,7 @@ def insertTags(tags):
             db_obj.tags.insert_one(document)
 
 
-def insertPost(title: str, body: str, tags: list, postType: str):
+def insertPost(title: str, body: str, tags: list, postType: str, parentId):
     # function to insert a post into the database
     global guestMode, currentuid
 
@@ -162,6 +162,11 @@ def insertPost(title: str, body: str, tags: list, postType: str):
     if postType == "1":
         document["AnswerCount"] = 0
 
+    # if the post is an answer, set the parentId to the question it answers
+    if postType == "2":
+        document["ParentId"] = parentId
+
+    
     # record the user id if the user is not a guest
     if not guestMode:
         document["OwnerUserId"] = currentuid

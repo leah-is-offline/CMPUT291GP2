@@ -17,7 +17,7 @@ class PostQuestion(State):
         title = input("Title: ")
         body = input("Body: ")
         tags = inputList("Tags (space seperated): ", " ")
-        resultPost = db.insertPost(title, body, tags, "1")
+        resultPost = db.insertPost(title, body, tags, "1", None)
 
         print("\nNice! Your question has been posted.")
         print("What would you like to do now?\n")
@@ -60,9 +60,10 @@ class PostAnswer(State):
         title = input("Title: ")
         body = input("Body: ")
         tags = inputList("Tags (space seperated): ", " ")
-        resultPost = db.insertPost(title, body, tags, "2")
+        resultPost = db.insertPost(title, body, tags, "2", PostAnswer.questionId)
 
         print("\nNice! Your Answer has been posted.")
         print("What would you like to do now?\n")
+        return Menu
 
 
