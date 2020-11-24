@@ -92,6 +92,7 @@ def insertVote(postId, voteType):
 
         if(not guestMode):
             document["UserId"] = currentuid
+            updateUser("voteCount")
         db_obj.votes.insert_one(document)
         increasePostScore(postId)
         print("\nSweet! You voted on this post!")
@@ -165,11 +166,15 @@ def insertPost(title: str, body: str, tags: list, postType: str, parentId):
     # if the post is an answer, set the parentId to the question it answers
     if postType == "2":
         document["ParentId"] = parentId
-
     
     # record the user id if the user is not a guest
     if not guestMode:
         document["OwnerUserId"] = currentuid
+        #update users collection
+        if postType == "1":
+            updateUser("questionCount")
+        elif postType =="2":
+            updateUser("answerCount")
 
     db_obj.posts.insert_one(document)
     return document
@@ -224,3 +229,13 @@ def getAnswers(postId):
 
     answers += results
     return answers
+
+def updateUser(field):
+    # function to update user collection when they make a post/vote
+    global currentuid
+    
+    db_obj.users.find_one_and_update(
+            {"_id": str(currentuid)},
+            {"$inc": {str(field): 1}},
+            new=True
+            )
