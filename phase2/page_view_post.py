@@ -12,17 +12,16 @@ class ViewPost(State):
         from page_make_post import PostAnswer
 
         global postId
+        
         if (ViewPost.postId == None):
             print('postId must be staticly defined to use this class!')
             return None
 
         print("-- Viewing post: %s --" % ViewPost.postId )
 
-        #post = db.getPost(ViewPost.postId)
         post = db.viewPost(ViewPost.postId)
         for key, value in post.items():
             print('{:15} {}'.format(key+':', value))
-        
         print("\n\nWhat would you like to do?")
 
         # Compose the list of user option / actions
@@ -55,17 +54,19 @@ class ViewPost(State):
         return option[1]
 
     def voteOnPost(self):
+        # function to call insertVote
         db.insertVote(ViewPost.postId, "2")
         input("Press enter to continue")
         return ViewPost
 
     def showAnswers(self):
-        #from page_menu import Menu #import here or Menu is undefined
+        # function to provide options to user after displaying post answers
+        from page_menu import Menu 
         answers = db.getAnswers(ViewPost.postId)
         if len(answers) == 0:
             print("This questions has not been answered yet.")
             print("\n\nWhat would you like to do?")
-            return self.Menu
+            return Menu
         else:
             global page_size
             page = 0
@@ -94,6 +95,7 @@ class ViewPost(State):
             
             
     def displayAnswerPage(self, page, answers:list):
+        # function to format and print answers of user chosen post
         from math import ceil
         global page_size
 
