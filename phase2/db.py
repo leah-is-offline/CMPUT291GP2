@@ -26,7 +26,7 @@ def register(uid):
     global guestMode, currentuid
     guestMode = False
 
-    uid = str(uid)  # uid in database is STRINGGGG >:0
+    uid = str(uid)  
     results = db_obj["users"].find({"_id": uid})
     for user in results:
         # username exists in database - unavailable
@@ -61,7 +61,7 @@ def login(uid):
     return False
 
 def getNextId(collectionName):
-    # function to return the next available ID for a collecion
+    # function to return the next available ID for a collection
     global db_obj
     counter = db_obj.counters.find_one_and_update(
         {"_id": collectionName}, {"$inc": {"maxId": 1}}, new=True
@@ -70,8 +70,8 @@ def getNextId(collectionName):
 
 
 def insertVote(postId, voteType):
+    # function to insert a vote (if a user has not already voted on the post)
     global guestMode, currentuid
-
     votedOn = False
     
     if (not guestMode):
@@ -92,7 +92,6 @@ def insertVote(postId, voteType):
 
         if(not guestMode):
             document["UserId"] = currentuid
-
         db_obj.votes.insert_one(document)
         increasePostScore(postId)
         print("\nSweet! You voted on this post!")
@@ -100,8 +99,6 @@ def insertVote(postId, voteType):
         
 def increasePostScore(postId):
     # function to increase score of a post
-    global db_obj
-    
     db_obj.posts.find_one_and_update(
                         {"Id": str(postId)},
                         {"$inc":{"Score": 1}},
@@ -111,13 +108,14 @@ def increasePostScore(postId):
 def insertTags(tags):
     # funct to Insert each tag in tags into the tags collection
 
-    tags_coll = db_obj["tags"]
     for tag in tags:
-        check_tag_exists = tags_coll.count_documents({"TagName": tag})
+        check_tag_exists = db_obj.tags.count_documents({"TagName": tag})
         if check_tag_exists > 0:
             # increase existing documents tag count by one
-            document = tags_coll.find_one_and_update(
-                {"TagName": tag}, {"$inc": {"Count": 1}}, new=True
+            document = db_obj.tags.find_one_and_update(
+                {"TagName": tag},
+                {"$inc":{"Count": 1}},
+                new=True
             )
         else:
             # create a new document for that tag
@@ -145,12 +143,11 @@ def insertPost(title: str, body: str, tags: list, postType: str):
         stringTags += "<%s>" % tag
 
     currentDate = datetime.now()
-    currentISODate = currentDate.isoformat()
 
     document = {
         "Id": getNextId("posts"),
         "PostTypeId": postType,
-        "CreationDate": currentISODate,
+        "CreationDate": currentDate.isoformat(),
         "Title": title,
         "Body": body,
         "Tags": stringTags,
@@ -174,14 +171,14 @@ def insertPost(title: str, body: str, tags: list, postType: str):
 
 
 def getPost(postId):
-    # function to  return post information
+    # function to return post
     result = list(db_obj.posts.find({"Id": postId}))
     if(len(result) > 0):
         return result[0]
     return None
 
 def viewPost(postId):
-    # function to update view count of post upon viewing and return post information
+    # function to return post and update post viewCount
     global db_obj
     
     post = getPost(postId)
@@ -196,9 +193,9 @@ def viewPost(postId):
 
     return post
 
+
 def getAnswers(postId):
-    # function to get list of posts where ParentID = postid
-    global db_obj
+    # function to get list of answers, provided a postId of a question
    
     questions = list(db_obj.posts.find({"Id": str(postId)}))
     if len(questions) == 0:
@@ -209,7 +206,6 @@ def getAnswers(postId):
     answers = []
 
     #pdb.set_trace()
-    
     idx = 0
     if ("AcceptedAnswerId" in question):
         for i,result in enumerate(results):

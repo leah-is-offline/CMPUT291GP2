@@ -60,11 +60,12 @@ class ViewPost(State):
         return ViewPost
 
     def showAnswers(self):
+        #from page_menu import Menu #import here or Menu is undefined
         answers = db.getAnswers(ViewPost.postId)
         if len(answers) == 0:
             print("This questions has not been answered yet.")
             print("\n\nWhat would you like to do?")
-            return Menu
+            return self.Menu
         else:
             global page_size
             page = 0
@@ -118,11 +119,3 @@ class ViewPost(State):
                   .format(cd = creationDate, score = score))
         return pageAnswers
             
-
-
-            #state dependent on user option
-            # user should be able to view full answer
-            # user should be able to view another page of answers
-            # user should be able to vote on answer
-            # user should be able to return to the main menu
-        
