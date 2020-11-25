@@ -12,7 +12,7 @@ class ViewPost(State):
         from page_make_post import PostAnswer
 
         global postId
-        
+
         if (ViewPost.postId == None):
             print('postId must be staticly defined to use this class!')
             return None
@@ -70,9 +70,9 @@ class ViewPost(State):
         else:
             global page_size
             page = 0
-            
+
             while True:
-                
+
                 pageAnswers = self.displayAnswerPage(page, answers)
 
                 options = []
@@ -83,17 +83,16 @@ class ViewPost(State):
                 else:
                     print("\nNo Answers...")
 
-            
                 choice = promptForOption(options)
                 if options[choice][1] == "next_page":
                     page += 1
                 elif options[choice][1] == "view_answer":
                     idx = inputIntRange("Which Answer: ", 1, len(pageAnswers))-1
                     ViewPost.postId = pageAnswers[idx]["Id"]
-                    
+
                     return ViewPost
-            
-            
+
+
     def displayAnswerPage(self, page, answers:list):
         # function to format and print answers of the post being viewed
         from math import ceil
@@ -109,15 +108,14 @@ class ViewPost(State):
 
         pageAnswers = answers[start:end]
         for idx, answer in enumerate(pageAnswers, start=1):
-            body = answer["Body"] 
+            body = answer["Body"]
             body = body[:min(len(body), 80)] + "..."
             creationDate = answer["CreationDate"]
-            score = answer["Score"] 
+            score = answer["Score"]
 
-    
             print("{i}. Body: {body}"
                   .format(i = idx, body = body))
             print("Creation Date: {cd} | Score : {score}\n"
                   .format(cd = creationDate, score = score))
         return pageAnswers
-            
+

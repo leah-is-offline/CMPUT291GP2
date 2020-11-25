@@ -23,6 +23,7 @@ class Login(State):
         while not db.login(uid):
             uid = inputInt("Login failed. Try again. uid: ")
         displayUserInfo(db.currentuid)
+        input("[Press enter to continue]")
         return Menu
 
 
