@@ -224,7 +224,7 @@ def getAnswers(postId):
                 break
 
         answers.append(results[idx])
-        answers[0]["Body"] = ("***" + answers[0]["Body"])
+        answers[0]["accepted"] = True
         results.remove(results[idx])
 
     answers += results

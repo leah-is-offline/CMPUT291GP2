@@ -112,7 +112,8 @@ class ViewPost(State):
             body = body[:min(len(body), 80)] + "..."
             creationDate = answer["CreationDate"]
             score = answer["Score"]
-
+            if "accepted" in answer:
+                print("[Accepted] ", end='')
             print("{i}. Body: {body}"
                   .format(i = idx, body = body))
             print("Creation Date: {cd} | Score : {score}\n"
