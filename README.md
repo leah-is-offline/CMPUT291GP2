@@ -1,4 +1,3 @@
-name: Leah Copeland 	ccid: copeland
-name: Azeez Abass		ccid: aabass
+Leah Copeland & Azeez Abass		
 
-a line that says we did not collaborate with anyone else
+TUI to simulate a mock forum 
